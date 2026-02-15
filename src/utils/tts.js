@@ -1,16 +1,25 @@
+import * as Speech from 'expo-speech';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { PROXY_URL, proxyFetch } from '../constants';
 
 const VOICE_STORAGE_KEY = 'briefing_voice';
 
 let isSpeaking = false;
-let currentAudio = null;
+let onDoneCallback = null;
 
 export async function getAvailableVoices() {
   try {
-    const response = await proxyFetch(`${PROXY_URL}/tts/voices`);
-    const data = await response.json();
-    return data.voices || [];
+    const all = await Speech.getAvailableVoicesAsync();
+    // Filtrer les voix françaises
+    const frVoices = all.filter(
+      (v) => v.language && (v.language.startsWith('fr') || v.language.startsWith('FR'))
+    );
+    // Formater pour l'UI
+    return frVoices.map((v) => ({
+      id: v.identifier,
+      name: v.name || v.identifier,
+      description: v.language,
+      gender: v.quality === 'Enhanced' ? 'female' : 'male',
+    }));
   } catch {
     return [];
   }
@@ -35,82 +44,73 @@ export async function speak(text, onStart, onDone) {
   }
 
   isSpeaking = true;
+  onDoneCallback = onDone;
   if (onStart) onStart();
 
   const voiceSettings = await loadVoiceSettings();
 
-  try {
-    const response = await proxyFetch(`${PROXY_URL}/tts/speak`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        text,
-        voiceId: voiceSettings.voiceId || undefined,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error('TTS request failed');
-    }
-
-    const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
-    currentAudio = new Audio(url);
-
-    currentAudio.onended = () => {
+  const options = {
+    language: 'fr-FR',
+    pitch: 1.0,
+    rate: 0.95,
+    onDone: () => {
       isSpeaking = false;
-      URL.revokeObjectURL(url);
-      currentAudio = null;
-      if (onDone) onDone();
-    };
-
-    currentAudio.onerror = () => {
+      if (onDoneCallback) onDoneCallback();
+      onDoneCallback = null;
+    },
+    onError: () => {
       isSpeaking = false;
-      URL.revokeObjectURL(url);
-      currentAudio = null;
-      if (onDone) onDone();
-    };
+      if (onDoneCallback) onDoneCallback();
+      onDoneCallback = null;
+    },
+    onStopped: () => {
+      isSpeaking = false;
+      if (onDoneCallback) onDoneCallback();
+      onDoneCallback = null;
+    },
+  };
 
-    await currentAudio.play();
-    return true;
-  } catch (err) {
-    isSpeaking = false;
-    currentAudio = null;
-    if (onDone) onDone();
-    return false;
+  if (voiceSettings.voiceId) {
+    options.voice = voiceSettings.voiceId;
+  } else {
+    // Auto-sélectionner une voix française si aucune n'est choisie
+    try {
+      const all = await Speech.getAvailableVoicesAsync();
+      const fr = all.find((v) => v.language && v.language.startsWith('fr'));
+      if (fr) options.voice = fr.identifier;
+    } catch {}
   }
+
+  Speech.speak(text, options);
+  return true;
 }
 
 export async function speakPreview(text, voiceId) {
   await stop();
 
-  try {
-    const response = await proxyFetch(`${PROXY_URL}/tts/speak`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, voiceId }),
-    });
+  const options = {
+    language: 'fr-FR',
+    pitch: 1.0,
+    rate: 0.95,
+  };
 
-    if (!response.ok) return;
+  if (voiceId) {
+    options.voice = voiceId;
+  } else {
+    try {
+      const all = await Speech.getAvailableVoicesAsync();
+      const fr = all.find((v) => v.language && v.language.startsWith('fr'));
+      if (fr) options.voice = fr.identifier;
+    } catch {}
+  }
 
-    const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
-    currentAudio = new Audio(url);
-    currentAudio.onended = () => {
-      URL.revokeObjectURL(url);
-      currentAudio = null;
-    };
-    await currentAudio.play();
-  } catch {}
+  Speech.speak(text, options);
 }
 
 export async function stop() {
   isSpeaking = false;
-  if (currentAudio) {
-    currentAudio.pause();
-    currentAudio.currentTime = 0;
-    currentAudio = null;
-  }
+  onDoneCallback = null;
+  Speech.stop();
 }
 
 export function getIsSpeaking() {

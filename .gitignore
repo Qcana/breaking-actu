@@ -46,3 +46,6 @@ mockup-design.html
 # secrets
 api.txt
 .env
+
+# Local Netlify folder
+.netlify
