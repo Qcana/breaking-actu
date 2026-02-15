@@ -8,7 +8,10 @@ const API_SECRET = process.env.API_SECRET || '';
 const PORT = process.env.PORT || 3001;
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: true,
+  allowedHeaders: ['Content-Type', 'x-api-token'],
+}));
 app.use(express.json({ limit: '5mb' }));
 
 // Protection par token secret
