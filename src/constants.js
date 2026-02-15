@@ -3,7 +3,7 @@ export const API_KEY = '70cb5569601d449ea2bb7cc2223c9b5e';
 const isLocal = typeof window !== 'undefined' && window.location?.hostname === 'localhost';
 export const PROXY_URL = isLocal
   ? 'http://localhost:3001/api'
-  : 'https://briefing-actu-proxy.onrender.com/api';
+  : 'https://briefing-actu1248745721048.onrender.com/api';
 export const API_SECRET = 'ba-2026-s3cr3t-k3y-xK9mP2vL';
 
 // Helper pour ajouter le token aux requetes
