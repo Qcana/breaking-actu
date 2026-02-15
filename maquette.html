@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maquette - Briefing Actu</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #1e293b;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 20px;
+    }
+
+    .label {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #94a3b8;
+      font-size: 14px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* Cadre téléphone */
+    .phone {
+      width: 375px;
+      height: 812px;
+      background: #f8fafc;
+      border-radius: 50px;
+      overflow: hidden;
+      box-shadow: 0 0 0 12px #334155, 0 0 0 14px #475569, 0 25px 60px rgba(0,0,0,0.5);
+      position: relative;
+    }
+
+    /* Encoche */
+    .notch {
+      width: 150px;
+      height: 30px;
+      background: #334155;
+      border-radius: 0 0 20px 20px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Barre de statut */
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 24px 0;
+      font-size: 12px;
+      font-weight: 600;
+      color: #1e293b;
+      margin-top: -26px;
+      position: relative;
+      z-index: 5;
+    }
+    .status-bar-right {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+
+    /* Contenu scrollable */
+    .screen {
+      height: calc(100% - 44px);
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+    .screen::-webkit-scrollbar { display: none; }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+    .app-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: #1e293b;
+      letter-spacing: -0.5px;
+    }
+    .date-text {
+      font-size: 13px;
+      color: #64748b;
+      margin-top: 2px;
+      text-transform: capitalize;
+    }
+    .refresh-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 22px;
+      background: #f1f5f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .refresh-btn:hover { background: #e2e8f0; }
+    .refresh-btn svg { width: 22px; height: 22px; color: #475569; }
+
+    /* Liste des cartes */
+    .news-list {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Carte */
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 18px;
+      border: 1px solid #f1f5f9;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .number-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 14px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 14px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .category-badge {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+      line-height: 1.35;
+      margin-bottom: 8px;
+    }
+    .card-description {
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 12px;
+      border-top: 1px solid #f1f5f9;
+    }
+    .source-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+    .time-text {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    /* Footer */
+    .list-footer {
+      text-align: center;
+      color: #cbd5e1;
+      font-size: 12px;
+      padding: 8px 0 24px;
+    }
+
+    /* Barre home iOS */
+    .home-bar {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 134px;
+      height: 5px;
+      background: #1e293b;
+      border-radius: 3px;
+      opacity: 0.3;
+    }
+
+    /* Couleurs catégories */
+    .cat-general { background-color: #6366f118; color: #6366f1; }
+    .badge-general { background-color: #6366f1; }
+    .cat-economie { background-color: #05966918; color: #059669; }
+    .badge-economie { background-color: #059669; }
+    .cat-techno { background-color: #d9770618; color: #d97706; }
+    .badge-techno { background-color: #d97706; }
+    .cat-sport { background-color: #2563eb18; color: #2563eb; }
+    .badge-sport { background-color: #2563eb; }
+    .cat-culture { background-color: #db277718; color: #db2777; }
+    .badge-culture { background-color: #db2777; }
+  </style>
+</head>
+<body>
+
+  <div class="label">Maquette visuelle — Briefing Actu</div>
+
+  <div class="phone">
+    <!-- Encoche -->
+    <div class="notch"></div>
+
+    <!-- Barre statut -->
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-bar-right">
+        <svg width="16" height="12" viewBox="0 0 16 12"><rect x="0" y="8" width="3" height="4" rx="0.5" fill="#1e293b"/><rect x="4" y="5" width="3" height="7" rx="0.5" fill="#1e293b"/><rect x="8" y="2" width="3" height="10" rx="0.5" fill="#1e293b"/><rect x="12" y="0" width="3" height="12" rx="0.5" fill="#1e293b"/></svg>
+        <svg width="16" height="12" viewBox="0 0 24 12"><path d="M1 4C4.3 1.3 8.5 0 12 0s7.7 1.3 11 4" stroke="#1e293b" stroke-width="2" fill="none"/><path d="M5 7.5C7 5.8 9.3 5 12 5s5 .8 7 2.5" stroke="#1e293b" stroke-width="2" fill="none"/><circle cx="12" cy="11" r="1.5" fill="#1e293b"/></svg>
+        <svg width="27" height="12" viewBox="0 0 27 12"><rect x="0" y="1" width="23" height="10" rx="2" stroke="#1e293b" stroke-width="1.5" fill="none"/><rect x="2" y="3" width="18" height="6" rx="1" fill="#059669"/><rect x="24.5" y="4" width="2" height="4" rx="0.5" fill="#1e293b"/></svg>
+      </div>
+    </div>
+
+    <div class="screen">
+      <!-- Header -->
+      <div class="header">
+        <div>
+          <div class="app-title">Briefing Actu</div>
+          <div class="date-text">mercredi 12 février 2026</div>
+        </div>
+        <button class="refresh-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        </button>
+      </div>
+
+      <!-- News List -->
+      <div class="news-list">
+
+        <!-- Card 1 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="number-badge badge-general">1</div>
+            <div class="category-badge cat-general">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              Général
+            </div>
+          </div>
+          <div class="card-title">Sommet européen : accord historique sur la défense commune</div>
+          <div class="card-description">Les 27 pays membres ont trouvé un accord sur un plan de défense commun doté de 150 milliards d'euros sur cinq ans.</div>
+          <div class="card-footer">
+            <div class="source-row">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/></svg>
+              Le Monde
+            </div>
+            <span class="time-text">Il y a 2h</span>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="number-badge badge-economie">2</div>
+            <div class="category-badge cat-economie">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+              Économie
+            </div>
+          </div>
+          <div class="card-title">La BCE maintient ses taux directeurs inchangés</div>
+          <div class="card-description">Christine Lagarde a annoncé une pause dans le cycle de baisse des taux, citant les incertitudes géopolitiques.</div>
+          <div class="card-footer">
+            <div class="source-row">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/></svg>
+              Les Échos
+            </div>
+            <span class="time-text">Il y a 3h</span>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="number-badge badge-techno">3</div>
+            <div class="category-badge cat-techno">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              Techno
+            </div>
+          </div>
+          <div class="card-title">L'IA générative franchit un cap dans la recherche médicale</div>
+          <div class="card-description">Un nouveau modèle d'intelligence artificielle a identifié trois molécules prometteuses contre Alzheimer.</div>
+          <div class="card-footer">
+            <div class="source-row">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/></svg>
+              France Info
+            </div>
+            <span class="time-text">Il y a 5h</span>
+          </div>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="number-badge badge-sport">4</div>
+            <div class="category-badge cat-sport">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20"/></svg>
+              Sport
+            </div>
+          </div>
+          <div class="card-title">Ligue des Champions : le PSG s'impose 3-1 à Munich</div>
+          <div class="card-description">Victoire éclatante du Paris Saint-Germain en huitièmes de finale grâce à un doublé de Dembélé.</div>
+          <div class="card-footer">
+            <div class="source-row">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/></svg>
+              L'Équipe
+            </div>
+            <span class="time-text">Il y a 1h</span>
+          </div>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="number-badge badge-culture">5</div>
+            <div class="category-badge cat-culture">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+              Culture
+            </div>
+          </div>
+          <div class="card-title">César 2026 : "Les Enfants du silence" rafle cinq récompenses</div>
+          <div class="card-description">Le film de Julie Bertrand a dominé la cérémonie avec le César du meilleur film et de la meilleure réalisation.</div>
+          <div class="card-footer">
+            <div class="source-row">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/></svg>
+              France Culture
+            </div>
+            <span class="time-text">Il y a 8h</span>
+          </div>
+        </div>
+
+        <div class="list-footer">Tire vers le bas pour actualiser</div>
+      </div>
+    </div>
+
+    <!-- Barre home -->
+    <div class="home-bar"></div>
+  </div>
+
+</body>
+</html>
