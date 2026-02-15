@@ -4,11 +4,22 @@ const cors = require('cors');
 
 const NEWSDATA_KEY = process.env.NEWSDATA_KEY || '';
 const ELEVENLABS_KEY = process.env.ELEVENLABS_KEY || '';
+const API_SECRET = process.env.API_SECRET || '';
 const PORT = process.env.PORT || 3001;
 
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '5mb' }));
+
+// Protection par token secret
+app.use('/api', (req, res, next) => {
+  if (!API_SECRET) return next(); // pas de secret = pas de protection (dev local)
+  const token = req.headers['x-api-token'] || req.query.token;
+  if (token !== API_SECRET) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  next();
+});
 
 // === NEWS ===
 app.get('/api/top-headlines', async (req, res) => {

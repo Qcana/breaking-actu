@@ -4,6 +4,13 @@ const isLocal = typeof window !== 'undefined' && window.location?.hostname === '
 export const PROXY_URL = isLocal
   ? 'http://localhost:3001/api'
   : 'https://briefing-actu-proxy.onrender.com/api';
+export const API_SECRET = 'ba-2026-s3cr3t-k3y-xK9mP2vL';
+
+// Helper pour ajouter le token aux requetes
+export function proxyFetch(url, options = {}) {
+  const headers = { ...options.headers, 'x-api-token': API_SECRET };
+  return fetch(url, { ...options, headers });
+}
 
 // Catégories avec couleurs et emojis
 // labelKey correspond aux clés de traduction dans i18n.js

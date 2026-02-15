@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { PROXY_URL } from '../constants';
+import { PROXY_URL, proxyFetch } from '../constants';
 
 const VOICE_STORAGE_KEY = 'briefing_voice';
 
@@ -8,7 +8,7 @@ let currentAudio = null;
 
 export async function getAvailableVoices() {
   try {
-    const response = await fetch(`${PROXY_URL}/tts/voices`);
+    const response = await proxyFetch(`${PROXY_URL}/tts/voices`);
     const data = await response.json();
     return data.voices || [];
   } catch {
@@ -40,7 +40,7 @@ export async function speak(text, onStart, onDone) {
   const voiceSettings = await loadVoiceSettings();
 
   try {
-    const response = await fetch(`${PROXY_URL}/tts/speak`, {
+    const response = await proxyFetch(`${PROXY_URL}/tts/speak`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -85,7 +85,7 @@ export async function speakPreview(text, voiceId) {
   await stop();
 
   try {
-    const response = await fetch(`${PROXY_URL}/tts/speak`, {
+    const response = await proxyFetch(`${PROXY_URL}/tts/speak`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text, voiceId }),

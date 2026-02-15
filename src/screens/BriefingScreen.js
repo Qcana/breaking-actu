@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { API_KEY, PROXY_URL, DEMO_NEWS, getCategoryInfo } from '../constants';
+import { API_KEY, PROXY_URL, DEMO_NEWS, getCategoryInfo, proxyFetch } from '../constants';
 import { getTodayFormatted } from '../utils/date';
 import { saveArticles, loadCachedArticles, saveToHistory } from '../utils/cache';
 import { useNetworkStatus } from '../utils/network';
@@ -65,7 +65,7 @@ export default function BriefingScreen({ navigation }) {
       } else {
         url = `${PROXY_URL}/top-headlines?pageSize=10`;
       }
-      const response = await fetch(url);
+      const response = await proxyFetch(url);
       const data = await response.json();
 
       if (data.status === 'ok' && data.articles?.length > 0) {
