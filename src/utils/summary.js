@@ -25,7 +25,7 @@ export function generateLocalSummary(articles, options = {}) {
   let filtered = articles;
   if (filterCategory && filterCategory !== 'all') {
     filtered = articles.filter((a) => {
-      const cat = getCategoryInfo(a.source?.name);
+      const cat = getCategoryInfo(a.source?.name, a.category);
       return cat.key === filterCategory;
     });
     if (filtered.length === 0) filtered = articles;
@@ -42,12 +42,12 @@ export function generateLocalSummary(articles, options = {}) {
 
   // Labels de catégories selon la langue
   const catLabels = lang === 'en'
-    ? { general: 'GENERAL', business: 'BUSINESS', technology: 'TECH', science: 'SCIENCE', health: 'HEALTH', sports: 'SPORTS', entertainment: 'CULTURE' }
-    : { general: 'GÉNÉRAL', business: 'ÉCONOMIE', technology: 'TECHNO', science: 'SCIENCE', health: 'SANTÉ', sports: 'SPORT', entertainment: 'CULTURE' };
+    ? { international: 'WORLD', politique: 'POLITICS', economie: 'ECONOMY', societe: 'SOCIETY', technology: 'TECH', science: 'SCIENCE', sports: 'SPORTS' }
+    : { international: 'INTERNATIONAL', politique: 'POLITIQUE', economie: 'ÉCONOMIE', societe: 'SOCIÉTÉ', technology: 'TECHNO', science: 'SCIENCE', sports: 'SPORT' };
 
   // Extraire la première phrase significative de chaque description
   const bulletPoints = filtered.map((article) => {
-    const cat = getCategoryInfo(article.source?.name);
+    const cat = getCategoryInfo(article.source?.name, article.category);
     const desc = extractKeyPhrase(article.description || article.title);
     const label = catLabels[cat.key] || (lang === 'en' ? 'GENERAL' : 'GÉNÉRAL');
     return {

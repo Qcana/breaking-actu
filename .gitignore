@@ -39,3 +39,10 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# mockups
+mockup-design.html
+
+# secrets
+api.txt
+.env

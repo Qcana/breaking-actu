@@ -24,15 +24,11 @@ const translations = {
     catAll: 'TOUT',
     catInternational: 'INTERNATIONAL',
     catPolitique: 'POLITIQUE',
+    catEconomie: 'ÉCONOMIE',
     catSociete: 'SOCIÉTÉ',
-    catBourse: 'BOURSE',
-    catEntreprise: 'ENTREPRISE',
     catTechnology: 'TECHNO',
     catScience: 'SCIENCE',
-    catHealth: 'SANTÉ',
     catSports: 'SPORT',
-    catEntertainment: 'CULTURE',
-    catEnvironnement: 'ENVIRONNEMENT',
 
     // History Screen
     history: 'Historique',
@@ -108,6 +104,14 @@ const translations = {
     savedAuto: 'Sauvegardé automatiquement',
     done: 'Terminé',
     version: 'Version',
+
+    // Voix
+    voice: 'Voix',
+    selectVoice: 'Voix de lecture',
+    defaultVoice: 'Voix par défaut',
+    testVoice: 'Tester',
+    voicePreviewText: 'Bonjour, voici votre briefing du jour.',
+    noVoicesAvailable: 'Aucune voix française disponible',
 
     // Notifications
     notifications: 'Notifications',

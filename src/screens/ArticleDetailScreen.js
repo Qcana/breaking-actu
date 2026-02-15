@@ -23,7 +23,7 @@ export default function ArticleDetailScreen({ route, navigation }) {
   const { theme } = useTheme();
   const { t, lang } = useI18n();
   const { article } = route.params;
-  const category = getCategoryInfo(article.source?.name);
+  const category = getCategoryInfo(article.source?.name, article.category);
   const [fav, setFav] = useState(false);
   const [heartAnim] = useState(new Animated.Value(1));
 
@@ -109,18 +109,6 @@ export default function ArticleDetailScreen({ route, navigation }) {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Hero image */}
-        {article.urlToImage ? (
-          <View style={[styles.heroContainer, { borderColor: theme.inputBorder }]}>
-            <Image source={{ uri: article.urlToImage }} style={styles.heroImage} />
-          </View>
-        ) : (
-          <View style={[styles.heroContainer, styles.heroPlaceholder, { borderColor: theme.inputBorder }]}>
-            <Text style={styles.heroPlaceholderIcon}>{category.emoji}</Text>
-            <Text style={[styles.heroPlaceholderText, { color: theme.textTertiary }]}>{t('articleImage')}</Text>
-          </View>
-        )}
-
         {/* Metadata */}
         <View style={styles.meta}>
           <View style={[styles.categoryBadge, { backgroundColor: category.bg }]}>

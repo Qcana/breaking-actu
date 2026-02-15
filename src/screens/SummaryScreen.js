@@ -201,15 +201,15 @@ export default function BriefingSummaryScreen() {
 function getCatKey(label) {
   const map = {
     'TOUT': 'all', 'ALL': 'all',
-    'GÉNÉRAL': 'general', 'GENERAL': 'general',
-    'ÉCONOMIE': 'business', 'BUSINESS': 'business',
+    'INTERNATIONAL': 'international', 'WORLD': 'international',
+    'POLITIQUE': 'politique', 'POLITICS': 'politique',
+    'ÉCONOMIE': 'economie', 'ECONOMY': 'economie',
+    'SOCIÉTÉ': 'societe', 'SOCIETY': 'societe',
     'TECHNO': 'technology', 'TECH': 'technology',
     'SCIENCE': 'science',
-    'SANTÉ': 'health', 'HEALTH': 'health',
     'SPORT': 'sports', 'SPORTS': 'sports',
-    'CULTURE': 'entertainment',
   };
-  return map[label] || 'general';
+  return map[label] || 'international';
 }
 
 const styles = StyleSheet.create({

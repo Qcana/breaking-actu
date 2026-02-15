@@ -12,7 +12,7 @@ import { mediumTap } from '../utils/haptics';
 export default function NewsCard({ item, index, onPress, isCached }) {
   const { theme } = useTheme();
   const { t, lang } = useI18n();
-  const category = getCategoryInfo(item.source?.name);
+  const category = getCategoryInfo(item.source?.name, item.category);
   const [fav, setFav] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.95)).current;

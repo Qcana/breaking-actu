@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { API_KEY, DEMO_NEWS, getCategoryInfo } from '../constants';
+import { API_KEY, PROXY_URL, DEMO_NEWS, getCategoryInfo } from '../constants';
 import { getTodayFormatted } from '../utils/date';
 import { saveArticles, loadCachedArticles, saveToHistory } from '../utils/cache';
 import { useNetworkStatus } from '../utils/network';
@@ -21,6 +21,7 @@ import NewsCard from '../components/NewsCard';
 import FilterBar from '../components/FilterBar';
 import SearchBar from '../components/SearchBar';
 import OfflineBanner from '../components/OfflineBanner';
+import SkeletonCard, { SkeletonFilterChips, SkeletonSearchBar } from '../components/SkeletonCard';
 import { lightTap } from '../utils/haptics';
 
 export default function BriefingScreen({ navigation }) {
@@ -58,12 +59,11 @@ export default function BriefingScreen({ navigation }) {
     try {
       const selectedSources = await loadSelectedSources();
       const sourcesParam = buildSourcesParam(selectedSources, lang);
-      const country = lang === 'en' ? 'us' : 'fr';
       let url;
       if (sourcesParam) {
-        url = `https://newsapi.org/v2/top-headlines?sources=${sourcesParam}&pageSize=5&apiKey=${API_KEY}`;
+        url = `${PROXY_URL}/top-headlines?sources=${sourcesParam}&pageSize=10`;
       } else {
-        url = `https://newsapi.org/v2/top-headlines?country=${country}&pageSize=5&apiKey=${API_KEY}`;
+        url = `${PROXY_URL}/top-headlines?pageSize=10`;
       }
       const response = await fetch(url);
       const data = await response.json();
@@ -103,6 +103,11 @@ export default function BriefingScreen({ navigation }) {
 
   useEffect(() => {
     fetchNews();
+    // Rafraîchissement automatique toutes les 10 minutes
+    const interval = setInterval(() => {
+      fetchNews(true);
+    }, 10 * 60 * 1000);
+    return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -117,7 +122,7 @@ export default function BriefingScreen({ navigation }) {
   // Filtrage par catégorie + recherche
   const filteredNews = news.filter((item) => {
     if (selectedCategory !== 'all') {
-      const cat = getCategoryInfo(item.source?.name);
+      const cat = getCategoryInfo(item.source?.name, item.category);
       if (cat.key !== selectedCategory) return false;
     }
     if (searchQuery.trim()) {
@@ -155,9 +160,12 @@ export default function BriefingScreen({ navigation }) {
 
       {/* Contenu */}
       {loading ? (
-        <View style={styles.centerContainer}>
-          <ActivityIndicator size="large" color={theme.accent} />
-          <Text style={[styles.loadingText, { color: theme.textSubtitle }]}>{t('loading')}</Text>
+        <View style={styles.list}>
+          <SkeletonSearchBar />
+          <SkeletonFilterChips />
+          {[0, 1, 2, 3].map((i) => (
+            <SkeletonCard key={i} index={i} />
+          ))}
         </View>
       ) : (
         <FlatList

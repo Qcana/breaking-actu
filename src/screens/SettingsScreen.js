@@ -28,6 +28,13 @@ import {
   saveNotificationSettings,
 } from '../utils/notifications';
 import { selectionTap, lightTap } from '../utils/haptics';
+import {
+  getAvailableVoices,
+  loadVoiceSettings,
+  saveVoiceSettings,
+  speakPreview,
+  stop as stopTTS,
+} from '../utils/tts';
 import CacheInfoBar from '../components/CacheInfoBar';
 
 export default function SettingsScreen() {
@@ -37,6 +44,10 @@ export default function SettingsScreen() {
   const availableSources = getSourcesForLanguage(lang);
 
   const [sourcesModalVisible, setSourcesModalVisible] = useState(false);
+  const [voiceModalVisible, setVoiceModalVisible] = useState(false);
+  const [voices, setVoices] = useState([]);
+  const [selectedVoiceId, setSelectedVoiceId] = useState(null);
+  const [selectedVoiceName, setSelectedVoiceName] = useState(null);
   const contentFade = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -55,6 +66,12 @@ export default function SettingsScreen() {
         setNotifHour(s.hour);
         setNotifMinute(s.minute);
       });
+      getAvailableVoices().then(setVoices);
+      loadVoiceSettings().then((s) => {
+        setSelectedVoiceId(s.voiceId);
+        setSelectedVoiceName(s.voiceName);
+      });
+      return () => { stopTTS(); };
     }, [])
   );
 
@@ -102,6 +119,21 @@ export default function SettingsScreen() {
     const settings = { enabled: notifEnabled, hour: notifHour, minute: m };
     await saveNotificationSettings(settings);
     if (notifEnabled) await scheduleDailyNotification(notifHour, m, lang);
+  };
+
+  const handleSelectVoice = async (voice) => {
+    selectionTap();
+    setSelectedVoiceId(voice ? voice.id : null);
+    setSelectedVoiceName(voice ? voice.name : null);
+    await saveVoiceSettings({
+      voiceId: voice ? voice.id : null,
+      voiceName: voice ? voice.name : null,
+    });
+  };
+
+  const handlePreviewVoice = (voiceId) => {
+    lightTap();
+    speakPreview(t('voicePreviewText'), voiceId);
   };
 
   const pad = (n) => String(n).padStart(2, '0');
@@ -188,6 +220,117 @@ export default function SettingsScreen() {
             </>
           )}
         </View>
+
+        {/* === VOIX === */}
+        <Text style={[styles.sectionTitle, { color: theme.textSubtitle }]}>{t('voice')}</Text>
+        <View style={[styles.card, { backgroundColor: theme.settingsBg, borderColor: theme.settingsBorder }]}>
+          <TouchableOpacity
+            style={styles.settingRow}
+            onPress={() => setVoiceModalVisible(true)}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="mic-outline" size={20} color={theme.accent} />
+            <Text style={[styles.settingLabel, { color: theme.textPrimary }]}>
+              {t('selectVoice')}
+            </Text>
+            <Text style={[styles.sourceCount, { color: theme.textTertiary }]}>
+              {selectedVoiceName || t('defaultVoice')}
+            </Text>
+            <Ionicons name="chevron-forward" size={18} color={theme.textMuted} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Modal voix */}
+        <Modal
+          visible={voiceModalVisible}
+          transparent
+          animationType="fade"
+          onRequestClose={() => { stopTTS(); setVoiceModalVisible(false); }}
+        >
+          <Pressable style={styles.overlay} onPress={() => { stopTTS(); setVoiceModalVisible(false); }}>
+            <Pressable style={[styles.modal, { backgroundColor: theme.bg, borderColor: theme.settingsBorder }]}>
+              <Text style={[styles.modalTitle, { color: theme.textTitle }]}>
+                {t('selectVoice')}
+              </Text>
+
+              <ScrollView style={styles.modalScroll} showsVerticalScrollIndicator={false}>
+                {/* Voix par défaut */}
+                <TouchableOpacity
+                  style={[styles.modalRow, !selectedVoiceId && { backgroundColor: theme.accent + '15' }]}
+                  onPress={() => handleSelectVoice(null)}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="mic-outline" size={20} color={theme.textPrimary} />
+                  <Text style={[styles.modalRowLabel, { color: theme.textPrimary }]}>{t('defaultVoice')}</Text>
+                  <TouchableOpacity
+                    onPress={() => handlePreviewVoice(null)}
+                    style={[styles.timeBtn, { marginRight: 4 }]}
+                  >
+                    <Ionicons name="play" size={14} color={theme.accent} />
+                  </TouchableOpacity>
+                  <Ionicons
+                    name={!selectedVoiceId ? 'checkmark-circle' : 'ellipse-outline'}
+                    size={20}
+                    color={!selectedVoiceId ? theme.accent : theme.textMuted}
+                  />
+                </TouchableOpacity>
+
+                <View style={[styles.separator, { backgroundColor: theme.settingsBorder }]} />
+
+                {voices.length === 0 ? (
+                  <View style={[styles.modalRow, { justifyContent: 'center' }]}>
+                    <Text style={[styles.modalRowLabel, { color: theme.textTertiary, textAlign: 'center' }]}>
+                      {t('noVoicesAvailable')}
+                    </Text>
+                  </View>
+                ) : (
+                  voices.map((voice, i) => {
+                    const isSelected = selectedVoiceId === voice.id;
+                    return (
+                      <React.Fragment key={voice.id}>
+                        <TouchableOpacity
+                          style={[styles.modalRow, isSelected && { backgroundColor: theme.accent + '10' }]}
+                          onPress={() => handleSelectVoice(voice)}
+                          activeOpacity={0.7}
+                        >
+                          <Ionicons name={voice.gender === 'female' ? 'woman' : 'man'} size={20} color={theme.textPrimary} />
+                          <View style={styles.sourceInfo}>
+                            <Text style={[styles.modalRowLabel, { color: theme.textPrimary }]}>{voice.name}</Text>
+                            <Text style={[styles.sourceCountry, { color: theme.textTertiary }]}>
+                              {voice.description}
+                            </Text>
+                          </View>
+                          <TouchableOpacity
+                            onPress={() => handlePreviewVoice(voice.id)}
+                            style={[styles.timeBtn, { marginRight: 4 }]}
+                          >
+                            <Ionicons name="play" size={14} color={theme.accent} />
+                          </TouchableOpacity>
+                          <Ionicons
+                            name={isSelected ? 'checkmark-circle' : 'ellipse-outline'}
+                            size={20}
+                            color={isSelected ? theme.accent : theme.textMuted}
+                          />
+                        </TouchableOpacity>
+                        {i < voices.length - 1 ? (
+                          <View style={[styles.separator, { backgroundColor: theme.settingsBorder }]} />
+                        ) : null}
+                      </React.Fragment>
+                    );
+                  })
+                )}
+              </ScrollView>
+
+              <TouchableOpacity
+                style={[styles.modalCloseBtn, { backgroundColor: theme.buttonBg, borderColor: theme.buttonBorder }]}
+                onPress={() => { stopTTS(); setVoiceModalVisible(false); }}
+                activeOpacity={0.8}
+              >
+                <Text style={[styles.modalCloseBtnText, { color: theme.textPrimary }]}>{t('done')}</Text>
+              </TouchableOpacity>
+            </Pressable>
+          </Pressable>
+        </Modal>
 
         {/* === SOURCES === */}
         <Text style={[styles.sectionTitle, { color: theme.textSubtitle }]}>{t('newsSources')}</Text>

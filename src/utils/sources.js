@@ -2,18 +2,22 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const STORAGE_KEY = 'briefing_sources';
 
-// Sources françaises disponibles
+// Sources françaises disponibles (NewsData.io)
 export const AVAILABLE_SOURCES = [
-  { id: 'le-monde', name: 'Le Monde', country: 'fr', emoji: '📰' },
-  { id: 'les-echos', name: 'Les Échos', country: 'fr', emoji: '💼' },
+  { id: 'lemonde', name: 'Le Monde', country: 'fr', emoji: '📰' },
+  { id: 'lesechos', name: 'Les Échos', country: 'fr', emoji: '💼' },
   { id: 'liberation', name: 'Libération', country: 'fr', emoji: '📰' },
-  { id: 'le-figaro', name: 'Le Figaro', country: 'fr', emoji: '📰' },
-  { id: 'france-info', name: 'France Info', country: 'fr', emoji: '📡' },
+  { id: 'lefigaro', name: 'Le Figaro', country: 'fr', emoji: '📰' },
+  { id: 'franceinfo', name: 'France Info', country: 'fr', emoji: '📡' },
+  { id: 'france24', name: 'France 24', country: 'fr', emoji: '🌍' },
+  { id: 'bfmtv', name: 'BFM TV', country: 'fr', emoji: '📺' },
   { id: 'lequipe', name: "L'Équipe", country: 'fr', emoji: '⚽' },
-  { id: 'france-culture', name: 'France Culture', country: 'fr', emoji: '🎵' },
-  { id: '01net', name: '01net', country: 'fr', emoji: '⚡' },
-  { id: 'bfm-tv', name: 'BFM TV', country: 'fr', emoji: '📺' },
-  { id: 'tf1', name: 'TF1 Info', country: 'fr', emoji: '📺' },
+  { id: '20minutes', name: '20 Minutes', country: 'fr', emoji: '📰' },
+  { id: 'leparisien', name: 'Le Parisien', country: 'fr', emoji: '📰' },
+  { id: 'ouest-france', name: 'Ouest-France', country: 'fr', emoji: '📰' },
+  { id: 'ladepeche', name: 'La Dépêche', country: 'fr', emoji: '📰' },
+  { id: 'numerama', name: 'Numerama', country: 'fr', emoji: '⚡' },
+  { id: 'rfi', name: 'RFI', country: 'fr', emoji: '🌍' },
 ];
 
 // Sources anglaises disponibles

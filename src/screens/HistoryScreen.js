@@ -28,7 +28,7 @@ function AnimatedHistoryCard({ item, index, theme, lang, t, onPress }) {
     ]).start();
   }, [fadeAnim, scaleAnim, index]);
 
-  const category = getCategoryInfo(item.source?.name);
+  const category = getCategoryInfo(item.source?.name, item.category);
   const locale = lang === 'en' ? 'en-US' : 'fr-FR';
   const time = item.publishedAt
     ? new Date(item.publishedAt).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })

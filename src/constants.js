@@ -1,5 +1,9 @@
 // Configuration API
 export const API_KEY = '70cb5569601d449ea2bb7cc2223c9b5e';
+const isLocal = typeof window !== 'undefined' && window.location?.hostname === 'localhost';
+export const PROXY_URL = isLocal
+  ? 'http://localhost:3001/api'
+  : 'https://briefing-actu-proxy.onrender.com/api';
 
 // Catégories avec couleurs et emojis
 // labelKey correspond aux clés de traduction dans i18n.js
@@ -7,41 +11,59 @@ export const CATEGORIES = {
   all:           { key: 'all',           labelKey: 'catAll',           emoji: '✦', color: '#e2e8f0', bg: 'rgba(192,192,192,0.15)' },
   international: { key: 'international', labelKey: 'catInternational', emoji: '🌍', color: '#a5b4fc', bg: 'rgba(99,102,241,0.2)' },
   politique:     { key: 'politique',     labelKey: 'catPolitique',     emoji: '🏛️', color: '#cbd5e1', bg: 'rgba(148,163,184,0.2)' },
+  economie:      { key: 'economie',      labelKey: 'catEconomie',      emoji: '💼', color: '#6ee7b7', bg: 'rgba(5,150,105,0.2)' },
   societe:       { key: 'societe',       labelKey: 'catSociete',       emoji: '👥', color: '#fdba74', bg: 'rgba(234,88,12,0.2)' },
-  bourse:        { key: 'bourse',        labelKey: 'catBourse',        emoji: '📈', color: '#6ee7b7', bg: 'rgba(5,150,105,0.2)' },
-  entreprise:    { key: 'entreprise',    labelKey: 'catEntreprise',    emoji: '🏢', color: '#67e8f9', bg: 'rgba(6,182,212,0.2)' },
   technology:    { key: 'technology',    labelKey: 'catTechnology',    emoji: '⚡', color: '#fcd34d', bg: 'rgba(217,119,6,0.2)' },
   science:       { key: 'science',       labelKey: 'catScience',       emoji: '🔬', color: '#c4b5fd', bg: 'rgba(139,92,246,0.2)' },
-  health:        { key: 'health',        labelKey: 'catHealth',        emoji: '🏥', color: '#fca5a5', bg: 'rgba(220,38,38,0.2)' },
   sports:        { key: 'sports',        labelKey: 'catSports',        emoji: '⚽', color: '#93c5fd', bg: 'rgba(37,99,235,0.2)' },
-  entertainment: { key: 'entertainment', labelKey: 'catEntertainment', emoji: '🎵', color: '#f9a8d4', bg: 'rgba(219,39,119,0.2)' },
-  environnement: { key: 'environnement', labelKey: 'catEnvironnement', emoji: '🌱', color: '#86efac', bg: 'rgba(22,163,74,0.2)' },
 };
 
-export function getCategoryInfo(source) {
+// Mapping des catégories NewsData.io vers les catégories de l'app
+const API_CAT_MAP = {
+  politics: 'politique',
+  business: 'economie',
+  economics: 'economie',
+  technology: 'technology',
+  science: 'science',
+  health: 'societe',
+  sports: 'sports',
+  entertainment: 'societe',
+  environment: 'societe',
+  world: 'international',
+  domestic: 'societe',
+  lifestyle: 'societe',
+  tourism: 'societe',
+  food: 'societe',
+  education: 'societe',
+  crime: 'societe',
+  top: 'international',
+};
+
+export function getCategoryInfo(source, apiCategories) {
+  // 1. Utiliser les catégories de l'API si disponibles
+  if (apiCategories && Array.isArray(apiCategories) && apiCategories.length > 0) {
+    for (const cat of apiCategories) {
+      const mapped = API_CAT_MAP[cat];
+      if (mapped && CATEGORIES[mapped]) return CATEGORIES[mapped];
+    }
+  }
+
+  // 2. Fallback : détection par nom de source
   const name = (source || '').toLowerCase();
-  if (name.includes('tech') || name.includes('wired') || name.includes('verge'))
+  if (name.includes('tech') || name.includes('numerama') || name.includes('01net'))
     return CATEGORIES.technology;
-  if (name.includes('sport') || name.includes('equipe') || name.includes('espn'))
+  if (name.includes('sport') || name.includes('equipe') || name.includes('10sport'))
     return CATEGORIES.sports;
-  if (name.includes('bourse') || name.includes('trading') || name.includes('cac'))
-    return CATEGORIES.bourse;
-  if (name.includes('entreprise') || name.includes('business') || name.includes('échos'))
-    return CATEGORIES.entreprise;
+  if (name.includes('capital') || name.includes('échos') || name.includes('echos') || name.includes('bourse') || name.includes('business'))
+    return CATEGORIES.economie;
   if (name.includes('politique') || name.includes('élysée') || name.includes('assemblée'))
     return CATEGORIES.politique;
-  if (name.includes('société') || name.includes('social'))
-    return CATEGORIES.societe;
-  if (name.includes('international') || name.includes('monde') || name.includes('reuters') || name.includes('afp'))
-    return CATEGORIES.international;
-  if (name.includes('culture') || name.includes('césar'))
-    return CATEGORIES.entertainment;
   if (name.includes('science'))
     return CATEGORIES.science;
-  if (name.includes('santé') || name.includes('health'))
-    return CATEGORIES.health;
-  if (name.includes('climat') || name.includes('environnement') || name.includes('écologie') || name.includes('énergie'))
-    return CATEGORIES.environnement;
+  if (name.includes('société') || name.includes('social') || name.includes('santé') || name.includes('culture'))
+    return CATEGORIES.societe;
+  if (name.includes('international') || name.includes('monde') || name.includes('france24') || name.includes('rfi'))
+    return CATEGORIES.international;
   return CATEGORIES.international;
 }
 

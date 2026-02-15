@@ -13,7 +13,7 @@ import { useTheme } from '../utils/theme';
 import { useI18n } from '../utils/i18n';
 import { selectionTap } from '../utils/haptics';
 
-const FILTER_ORDER = ['all', 'international', 'politique', 'societe', 'bourse', 'entreprise', 'technology', 'sports', 'entertainment', 'health', 'science', 'environnement'];
+const FILTER_ORDER = ['all', 'international', 'politique', 'economie', 'societe', 'technology', 'science', 'sports'];
 
 export default function FilterBar({ selectedCategory, onSelectCategory }) {
   const { theme } = useTheme();
