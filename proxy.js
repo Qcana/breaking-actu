@@ -63,7 +63,10 @@ app.get('/api/top-headlines', async (req, res) => {
   }
 });
 
-// === SUMMARY IA (Gemini) ===
+// === SUMMARY IA (Gemini) avec cache ===
+const summaryCache = { data: null, key: null, timestamp: 0 };
+const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+
 app.post('/api/summary', async (req, res) => {
   const { articles, lang = 'fr' } = req.body;
 
@@ -73,6 +76,14 @@ app.post('/api/summary', async (req, res) => {
 
   if (!GEMINI_API_KEY) {
     return res.status(503).json({ error: 'AI summary not configured' });
+  }
+
+  // Clé de cache basée sur les titres des articles + langue
+  const cacheKey = lang + ':' + articles.map((a) => a.title).sort().join('|');
+  const now = Date.now();
+
+  if (summaryCache.key === cacheKey && (now - summaryCache.timestamp) < CACHE_TTL) {
+    return res.json({ status: 'ok', summary: summaryCache.data, source: 'cache' });
   }
 
   const isFr = lang === 'fr';
@@ -161,6 +172,12 @@ ${articleList}`;
     if (!text) throw new Error('Empty response from Gemini');
 
     const summary = JSON.parse(text);
+
+    // Stocker en cache
+    summaryCache.data = summary;
+    summaryCache.key = cacheKey;
+    summaryCache.timestamp = now;
+
     res.json({ status: 'ok', summary, source: 'ai' });
   } catch (err) {
     console.error('AI summary error:', err.message);
