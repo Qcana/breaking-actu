@@ -49,19 +49,17 @@ export default function AnimatedSplash({ onFinish }) {
           { opacity: logoOpacity, transform: [{ scale: logoScale }] },
         ]}
       >
-        <View style={styles.diamondOuter}>
-          <LinearGradient
-            colors={['#6366f1', '#818cf8']}
-            style={styles.diamondGradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <View style={styles.diamondBorder}>
-              <Text style={styles.diamondLine1}>BRIEFING</Text>
-              <Text style={styles.diamondLine2}>ACTU</Text>
-            </View>
-          </LinearGradient>
-        </View>
+        <LinearGradient
+          colors={['#6366f1', '#818cf8']}
+          style={styles.diamond}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        >
+          <View style={styles.diamondText}>
+            <Text style={styles.diamondLine1}>BRIEFING</Text>
+            <Text style={styles.diamondLine2}>ACTU</Text>
+          </View>
+        </LinearGradient>
       </Animated.View>
 
       {/* Sous-titre */}
@@ -85,32 +83,17 @@ const styles = StyleSheet.create({
   logoContainer: {
     marginBottom: 24,
   },
-  diamondOuter: {
-    width: 120,
-    height: 120,
-    transform: [{ rotate: '45deg' }],
-    shadowColor: '#6366f1',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.5,
-    shadowRadius: 25,
-    elevation: 15,
-  },
-  diamondGradient: {
+  diamond: {
     width: 120,
     height: 120,
     borderRadius: 22,
+    transform: [{ rotate: '45deg' }],
     justifyContent: 'center',
     alignItems: 'center',
   },
-  diamondBorder: {
-    width: 112,
-    height: 112,
-    borderRadius: 19,
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.15)',
-    justifyContent: 'center',
-    alignItems: 'center',
+  diamondText: {
     transform: [{ rotate: '-45deg' }],
+    alignItems: 'center',
   },
   diamondLine1: {
     fontSize: 22,

@@ -90,11 +90,11 @@ export default function OnboardingScreen({ onDone }) {
         ]}>
           <LinearGradient
             colors={['#6366f1', '#818cf8']}
-            style={styles.diamondGradient}
+            style={styles.diamond}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
           >
-            <Animated.View style={[styles.diamondBorder, {
+            <Animated.View style={[styles.diamondText, {
               transform: [
                 { rotate: spinValue.interpolate({
                   inputRange: [0, 3],
@@ -149,29 +149,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
   },
   diamondContainer: {
-    width: 140,
-    height: 140,
     marginBottom: 40,
-    shadowColor: '#6366f1',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.5,
-    shadowRadius: 25,
-    elevation: 15,
   },
-  diamondGradient: {
+  diamond: {
     width: 140,
     height: 140,
     borderRadius: 26,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  diamondBorder: {
-    width: 130,
-    height: 130,
-    borderRadius: 22,
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.15)',
-    justifyContent: 'center',
+  diamondText: {
     alignItems: 'center',
   },
   diamondLine1: {
