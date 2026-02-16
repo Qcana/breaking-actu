@@ -14,6 +14,11 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '5mb' }));
 
+// === HEALTH (keep-alive) ===
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', uptime: process.uptime() });
+});
+
 // Protection par token secret
 app.use('/api', (req, res, next) => {
   if (!API_SECRET) return next(); // pas de secret = pas de protection (dev local)

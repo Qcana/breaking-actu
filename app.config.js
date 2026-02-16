@@ -31,8 +31,12 @@ export default {
     experiments: {
       baseUrl: "/breaking-actu",
     },
+    plugins: [
+      "@sentry/react-native",
+    ],
     extra: {
       apiSecret: process.env.API_SECRET || '',
+      sentryDsn: process.env.SENTRY_DSN || '',
       eas: {
         projectId: "9976b677-9ae4-465f-9215-a5bff62e1d2e",
       },

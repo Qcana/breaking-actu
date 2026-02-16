@@ -6,10 +6,20 @@ import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
+import * as Sentry from '@sentry/react-native';
+import Constants from 'expo-constants';
 
 import { ThemeProvider, useTheme } from './src/utils/theme';
 import { I18nProvider, useI18n } from './src/utils/i18n';
 import ErrorBoundary from './src/components/ErrorBoundary';
+
+const sentryDsn = Constants.expoConfig?.extra?.sentryDsn || '';
+if (sentryDsn) {
+  Sentry.init({
+    dsn: sentryDsn,
+    enableAutoSessionTracking: true,
+  });
+}
 
 import BriefingScreen from './src/screens/BriefingScreen';
 import HistoryScreen from './src/screens/HistoryScreen';
