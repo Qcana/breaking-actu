@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { API_KEY, PROXY_URL, DEMO_NEWS, getCategoryInfo, proxyFetch } from '../constants';
+import { PROXY_URL, DEMO_NEWS, getCategoryInfo, proxyFetch } from '../constants';
 import { getTodayFormatted } from '../utils/date';
 import { saveArticles, loadCachedArticles, saveToHistory } from '../utils/cache';
 import { useNetworkStatus } from '../utils/network';

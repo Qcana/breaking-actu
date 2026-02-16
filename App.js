@@ -9,6 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { ThemeProvider, useTheme } from './src/utils/theme';
 import { I18nProvider, useI18n } from './src/utils/i18n';
+import ErrorBoundary from './src/components/ErrorBoundary';
 
 import BriefingScreen from './src/screens/BriefingScreen';
 import HistoryScreen from './src/screens/HistoryScreen';
@@ -148,10 +149,12 @@ function AppInner() {
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <I18nProvider>
-        <AppInner />
-      </I18nProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <I18nProvider>
+          <AppInner />
+        </I18nProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }

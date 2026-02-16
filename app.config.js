@@ -1,0 +1,42 @@
+import 'dotenv/config';
+
+export default {
+  expo: {
+    name: "briefing-actu",
+    slug: "briefing-actu",
+    version: "1.0.0",
+    orientation: "portrait",
+    icon: "./assets/icon.png",
+    userInterfaceStyle: "light",
+    newArchEnabled: true,
+    splash: {
+      image: "./assets/splash-icon.png",
+      resizeMode: "contain",
+      backgroundColor: "#ffffff",
+    },
+    ios: {
+      supportsTablet: true,
+    },
+    android: {
+      package: "com.qcana.briefingactu",
+      adaptiveIcon: {
+        foregroundImage: "./assets/adaptive-icon.png",
+        backgroundColor: "#ffffff",
+      },
+      edgeToEdgeEnabled: true,
+    },
+    web: {
+      favicon: "./assets/favicon.png",
+    },
+    experiments: {
+      baseUrl: "/breaking-actu",
+    },
+    extra: {
+      apiSecret: process.env.API_SECRET || '',
+      eas: {
+        projectId: "9976b677-9ae4-465f-9215-a5bff62e1d2e",
+      },
+    },
+    owner: "q-cana",
+  },
+};
