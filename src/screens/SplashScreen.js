@@ -21,11 +21,11 @@ export default function AnimatedSplash({ onFinish }) {
       ]),
       // Titre slide up
       Animated.parallel([
-        Animated.timing(titleOpacity, { toValue: 1, duration: 400, useNativeDriver: true }),
-        Animated.timing(titleY, { toValue: 0, duration: 400, useNativeDriver: true }),
+        Animated.timing(titleOpacity, { toValue: 1, duration: 1000, useNativeDriver: true }),
+        Animated.timing(titleY, { toValue: 0, duration: 1000, useNativeDriver: true }),
       ]),
       // Sous-titre
-      Animated.timing(subtitleOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
+      Animated.timing(subtitleOpacity, { toValue: 1, duration: 800, useNativeDriver: true }),
       // Pause
       Animated.delay(600),
       // Fade out
@@ -42,24 +42,26 @@ export default function AnimatedSplash({ onFinish }) {
         style={StyleSheet.absoluteFill}
       />
 
-      {/* Logo */}
+      {/* Logo diamant */}
       <Animated.View
         style={[
           styles.logoContainer,
           { opacity: logoOpacity, transform: [{ scale: logoScale }] },
         ]}
       >
-        <LinearGradient
-          colors={theme.numberBadge}
-          style={styles.logoBg}
-        >
-          <Text style={[styles.logoText, { color: theme.numberText }]}>BA</Text>
-        </LinearGradient>
-      </Animated.View>
-
-      {/* Titre */}
-      <Animated.View style={{ opacity: titleOpacity, transform: [{ translateY: titleY }] }}>
-        <Text style={[styles.title, { color: theme.textTitle }]}>Briefing Actu</Text>
+        <View style={styles.diamondOuter}>
+          <LinearGradient
+            colors={['#6366f1', '#818cf8']}
+            style={styles.diamondGradient}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          >
+            <View style={styles.diamondBorder}>
+              <Text style={styles.diamondLine1}>BRIEFING</Text>
+              <Text style={styles.diamondLine2}>ACTU</Text>
+            </View>
+          </LinearGradient>
+        </View>
       </Animated.View>
 
       {/* Sous-titre */}
@@ -69,12 +71,6 @@ export default function AnimatedSplash({ onFinish }) {
         </Text>
       </Animated.View>
 
-      {/* Dots de chargement */}
-      <Animated.View style={[styles.dotsRow, { opacity: subtitleOpacity }]}>
-        <View style={[styles.dot, { backgroundColor: theme.accent }]} />
-        <View style={[styles.dot, { backgroundColor: theme.accent, opacity: 0.5 }]} />
-        <View style={[styles.dot, { backgroundColor: theme.accent, opacity: 0.25 }]} />
-      </Animated.View>
     </Animated.View>
   );
 }
@@ -87,43 +83,51 @@ const styles = StyleSheet.create({
     zIndex: 100,
   },
   logoContainer: {
-    marginBottom: 20,
+    marginBottom: 24,
   },
-  logoBg: {
-    width: 80,
-    height: 80,
-    borderRadius: 24,
+  diamondOuter: {
+    width: 120,
+    height: 120,
+    transform: [{ rotate: '45deg' }],
+    shadowColor: '#6366f1',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.5,
+    shadowRadius: 25,
+    elevation: 15,
+  },
+  diamondGradient: {
+    width: 120,
+    height: 120,
+    borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.4,
-    shadowRadius: 20,
-    elevation: 12,
   },
-  logoText: {
-    fontSize: 30,
+  diamondBorder: {
+    width: 112,
+    height: 112,
+    borderRadius: 19,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    transform: [{ rotate: '-45deg' }],
+  },
+  diamondLine1: {
+    fontSize: 22,
     fontWeight: '900',
-    letterSpacing: -1,
+    color: '#fff',
+    letterSpacing: 3,
   },
-  title: {
-    fontSize: 32,
-    fontWeight: '800',
-    letterSpacing: -1,
-    marginBottom: 8,
+  diamondLine2: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: 'rgba(255,255,255,0.7)',
+    letterSpacing: 5,
+    marginTop: 2,
   },
   subtitle: {
     fontSize: 14,
     letterSpacing: 0.5,
     marginBottom: 30,
-  },
-  dotsRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
   },
 });

@@ -136,12 +136,16 @@ export default function BriefingSummaryScreen() {
           <View style={[styles.briefingCard, { backgroundColor: theme.cardBg, borderColor: theme.inputBorder }]}>
             {/* Intro */}
             <View style={[styles.introSection, { borderBottomColor: theme.footerBorder }]}>
-              <LinearGradient
-                colors={theme.numberBadge}
-                style={styles.logoBadge}
-              >
-                <Text style={[styles.logoText, { color: theme.numberText }]}>BA</Text>
-              </LinearGradient>
+              <View style={styles.diamondWrap}>
+                <LinearGradient
+                  colors={['#6366f1', '#818cf8']}
+                  style={styles.diamondBadge}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                >
+                  <Text style={styles.diamondBadgeText}>BA</Text>
+                </LinearGradient>
+              </View>
               <Text style={[styles.introText, { color: theme.textPrimary }]}>{summary.intro}</Text>
             </View>
 
@@ -256,17 +260,26 @@ const styles = StyleSheet.create({
     padding: 18,
     borderBottomWidth: 1,
   },
-  logoBadge: {
-    width: 42,
-    height: 42,
-    borderRadius: 14,
+  diamondWrap: {
+    width: 46,
+    height: 46,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  logoText: {
-    fontSize: 16,
+  diamondBadge: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    transform: [{ rotate: '45deg' }],
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  diamondBadgeText: {
+    fontSize: 14,
     fontWeight: '900',
+    color: '#fff',
     letterSpacing: -0.5,
+    transform: [{ rotate: '-45deg' }],
   },
   introText: {
     flex: 1,
