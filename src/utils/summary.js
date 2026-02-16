@@ -1,9 +1,52 @@
-import { getCategoryInfo } from '../constants';
+import { getCategoryInfo, PROXY_URL, proxyFetch } from '../constants';
+
+/**
+ * Génère un résumé via l'API Claude (côté proxy).
+ * Retourne null en cas d'erreur (le caller doit fallback sur generateLocalSummary).
+ */
+export async function generateAISummary(articles, options = {}) {
+  const { lang = 'fr' } = options;
+
+  try {
+    const response = await proxyFetch(`${PROXY_URL}/summary`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ articles, lang }),
+    });
+
+    if (!response.ok) return null;
+
+    const data = await response.json();
+    if (data.status !== 'ok' || !data.summary) return null;
+
+    const { summary } = data;
+    const locale = lang === 'en' ? 'en-US' : 'fr-FR';
+    const date = new Date().toLocaleDateString(locale, {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+    });
+    const titlePrefix = lang === 'en' ? 'Briefing for' : 'Briefing du';
+
+    return {
+      title: `${titlePrefix} ${date}`,
+      intro: summary.intro,
+      body: summary.bulletPoints
+        .map((bp, i) => `${i + 1}. **${bp.title}**\n   ${bp.summary} _(${bp.source})_`)
+        .join('\n\n'),
+      bulletPoints: summary.bulletPoints,
+      spokenText: summary.spokenText,
+      articleCount: summary.bulletPoints.length,
+      generatedAt: Date.now(),
+      isAI: true,
+    };
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Génère un résumé condensé local à partir des articles.
  * Extraction des phrases-clés + mise en forme narrative.
- * Peut être remplacé plus tard par un appel API Claude.
+ * Utilisé comme fallback quand l'API Claude est indisponible.
  */
 export function generateLocalSummary(articles, options = {}) {
   const { filterCategory = null, lang = 'fr' } = options;

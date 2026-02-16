@@ -13,7 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { CATEGORIES } from '../constants';
 import { loadCachedArticles } from '../utils/cache';
-import { generateLocalSummary } from '../utils/summary';
+import { generateAISummary, generateLocalSummary } from '../utils/summary';
 import { speak, stop } from '../utils/tts';
 import { getTodayFormatted } from '../utils/date';
 import { useTheme } from '../utils/theme';
@@ -63,10 +63,28 @@ export default function BriefingSummaryScreen() {
     }, [])
   );
 
+  const [isAI, setIsAI] = useState(false);
+
   useEffect(() => {
     if (articles.length === 0) return;
-    const result = generateLocalSummary(articles, { lang });
-    setSummary(result);
+    let active = true;
+
+    (async () => {
+      // Tenter le résumé IA
+      const aiResult = await generateAISummary(articles, { lang });
+      if (!active) return;
+
+      if (aiResult) {
+        setSummary(aiResult);
+        setIsAI(true);
+      } else {
+        // Fallback local
+        setSummary(generateLocalSummary(articles, { lang }));
+        setIsAI(false);
+      }
+    })();
+
+    return () => { active = false; };
   }, [articles, lang]);
 
   const handleTTS = async () => {
@@ -146,7 +164,15 @@ export default function BriefingSummaryScreen() {
                   <Text style={styles.diamondBadgeText}>BA</Text>
                 </LinearGradient>
               </View>
-              <Text style={[styles.introText, { color: theme.textPrimary }]}>{summary.intro}</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.introText, { color: theme.textPrimary }]}>{summary.intro}</Text>
+                {isAI && (
+                  <View style={styles.aiBadge}>
+                    <Ionicons name="sparkles" size={10} color="#818cf8" />
+                    <Text style={styles.aiBadgeText}>IA</Text>
+                  </View>
+                )}
+              </View>
             </View>
 
             {/* Points clés */}
@@ -286,6 +312,25 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     lineHeight: 20,
+  },
+
+  // AI badge
+  aiBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    alignSelf: 'flex-start',
+    marginTop: 8,
+    backgroundColor: 'rgba(99,102,241,0.15)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  aiBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#818cf8',
+    letterSpacing: 0.5,
   },
 
   // Bullet rows
