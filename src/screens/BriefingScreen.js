@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import Fuse from 'fuse.js';
 import { PROXY_URL, DEMO_NEWS, getCategoryInfo, proxyFetch } from '../constants';
 import { getTodayFormatted } from '../utils/date';
 import { saveArticles, loadCachedArticles, saveToHistory } from '../utils/cache';
@@ -119,21 +120,30 @@ export default function BriefingScreen({ navigation }) {
     navigation.navigate('ArticleDetail', { article });
   };
 
-  // Filtrage par catégorie + recherche
-  const filteredNews = news.filter((item) => {
+  // Filtrage par catégorie + recherche fuzzy
+  const filteredNews = (() => {
+    let items = news;
+
+    // Filtre catégorie
     if (selectedCategory !== 'all') {
-      const cat = getCategoryInfo(item.source?.name, item.category);
-      if (cat.key !== selectedCategory) return false;
+      items = items.filter((item) => {
+        const cat = getCategoryInfo(item.source?.name, item.category);
+        return cat.key === selectedCategory;
+      });
     }
+
+    // Recherche fuzzy
     if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      const title = (item.title || '').toLowerCase();
-      const desc = (item.description || '').toLowerCase();
-      const source = (item.source?.name || '').toLowerCase();
-      if (!title.includes(q) && !desc.includes(q) && !source.includes(q)) return false;
+      const fuse = new Fuse(items, {
+        keys: ['title', 'description', 'source.name'],
+        threshold: 0.4,
+        ignoreLocation: true,
+      });
+      items = fuse.search(searchQuery).map((r) => r.item);
     }
-    return true;
-  });
+
+    return items;
+  })();
 
   return (
     <View style={[styles.container, { backgroundColor: theme.bg }]}>
