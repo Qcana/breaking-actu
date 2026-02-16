@@ -1,24 +1,30 @@
 # Briefing Actu
 
-Application mobile React Native (Expo) qui affiche les 10 actualites les plus importantes du jour en France, en temps reel.
+Application mobile et web React Native (Expo) qui affiche les actualites les plus importantes du jour en France, en temps reel.
+
+## Demo
+
+- **Web** : [https://qcana.github.io/breaking-actu/](https://qcana.github.io/breaking-actu/)
+- **Android APK** : disponible via EAS Build
 
 ## Fonctionnalites
 
-- Affichage des 10 actualites principales via NewsData.io (temps reel)
+- Affichage des actualites principales via NewsData.io (temps reel)
 - 7 categories : International, Politique, Economie, Societe, Techno, Science, Sport
 - 14 sources francaises disponibles (Le Monde, Le Figaro, BFM TV, France Info, etc.)
 - Filtrage par categorie et recherche d'articles
 - Pull-to-refresh + rafraichissement automatique toutes les 10 minutes
 - Affichage du temps relatif ("Il y a 2h", "Il y a 30 min")
-- Design epure avec cartes numerotees et effets chrome
-- Ecran de resume/briefing avec synthese vocale via ElevenLabs (voix naturelles)
-- Choix de la voix dans les Reglages : Roger, George, Sarah, Alice
+- Skeleton loading anime pendant le chargement
+- Logo diamant anime avec rotation 360 a l'onboarding
+- Ecran de resume/briefing avec synthese vocale (voix systeme, gratuit et illimite)
+- Choix de la voix francaise dans les Reglages
 - Systeme de favoris avec animation
 - Historique des briefings passes avec timeline et statistiques
 - Mode hors-ligne avec cache automatique et indicateur de stockage
 - Banniere offline/sync avec barre de progression
-- Notifications push quotidiennes configurables (heure au choix dans les Reglages, compatible web et mobile)
-- Ecran d'onboarding au premier lancement
+- Notifications push quotidiennes configurables (heure au choix, compatible web et mobile)
+- Ecran d'onboarding anime au premier lancement
 - Retour haptique sur toutes les interactions
 - Animations d'entree en cascade sur les cartes
 - Theme sombre/clair commutable
@@ -26,29 +32,39 @@ Application mobile React Native (Expo) qui affiche les 10 actualites les plus im
 
 ## Architecture
 
-L'application utilise un **proxy Express** (`proxy.js`) qui sert d'intermediaire entre le front et les APIs externes. Cela permet de :
-- Contourner les restrictions CORS pour le web
-- Masquer les cles API (non exposees dans le navigateur)
-- Adapter le format de reponse des APIs pour le front
-- Changer d'API facilement sans modifier le front
+L'application utilise un **proxy Express** (`proxy.js`) deploye sur **Render** qui sert d'intermediaire entre le front et les APIs externes :
+- Contourne les restrictions CORS pour le web
+- Masque les cles API (non exposees dans le navigateur)
+- Protection par token secret (`x-api-token`)
+- Adapte le format de reponse des APIs pour le front
 
-**APIs utilisees via le proxy :**
+**API utilisee via le proxy :**
 - **NewsData.io** — Actualites en temps reel
-- **ElevenLabs** — Synthese vocale avec voix naturelles
+
+**TTS (synthese vocale) :**
+- **expo-speech** — Voix natives du systeme (gratuit, illimite, pas de serveur requis)
+
+## Deploiement
+
+| Service | Usage | URL |
+|---------|-------|-----|
+| **GitHub Pages** | Site web statique | [qcana.github.io/breaking-actu](https://qcana.github.io/breaking-actu/) |
+| **Render** | Proxy API (backend) | Heberge sur Render (free tier) |
+| **EAS Build** | APK Android | Via Expo Application Services |
 
 ## Pre-requis
 
 - **Node.js** (v18 ou superieur)
 - **Expo CLI** : installe automatiquement via npx
 - **Un compte NewsData.io** : cree un compte gratuit sur [newsdata.io](https://newsdata.io) pour obtenir une cle API (200 requetes/jour)
-- **Un compte ElevenLabs** : cree un compte gratuit sur [elevenlabs.io](https://elevenlabs.io) pour la synthese vocale (10 000 caracteres/mois)
 - **Expo Go** (app mobile) : installe sur ton telephone depuis l'App Store ou Google Play
 
 ## Installation
 
-1. Ouvre un terminal et va dans le dossier du projet :
+1. Clone le repo :
    ```
-   cd C:\Users\Code\Documents\briefing-actu
+   git clone https://github.com/Qcana/breaking-actu.git
+   cd breaking-actu
    ```
 
 2. Installe les dependances :
@@ -56,11 +72,13 @@ L'application utilise un **proxy Express** (`proxy.js`) qui sert d'intermediaire
    npm install
    ```
 
-3. **Configure tes cles API** dans `proxy.js` :
-   - `NEWSDATA_KEY` : ta cle NewsData.io
-   - `ELEVENLABS_KEY` : ta cle ElevenLabs
+3. Configure tes cles API dans un fichier `.env` :
+   ```
+   NEWSDATA_KEY=ta_cle_newsdata
+   API_SECRET=ton_secret_pour_le_proxy
+   ```
 
-## Lancement
+## Lancement (developpement)
 
 Deux terminaux sont necessaires :
 
@@ -74,59 +92,67 @@ npm run proxy
 npm run web
 ```
 
-Autres options de lancement :
+Autres options :
 - **Sur telephone** : `npx expo start` puis scanne le QR code avec Expo Go
-- **Sur Android** : `npm run android` (necessite un emulateur)
+- **Sur Android** : `npm run android`
+
+## Build production
+
+### Web (GitHub Pages)
+```
+npx expo export --platform web
+```
+Puis deployer le dossier `dist/` sur GitHub Pages (branche `gh-pages`).
+
+### Android (APK)
+```
+npx eas-cli build --platform android --profile preview
+```
+Genere un APK installable via Expo Application Services.
 
 ## Structure du projet
 
 ```
 briefing-actu/
   App.js                  # Point d'entree, navigation principale (tabs + stacks)
-  index.js                # Enregistrement de l'app Expo
-  proxy.js                # Proxy Express (relais vers NewsData.io + ElevenLabs TTS)
-  package.json            # Dependances du projet
+  proxy.js                # Proxy Express (relais vers NewsData.io)
+  .env                    # Cles API (gitignore)
+  eas.json                # Configuration EAS Build (APK/AAB)
   src/
-    constants.js          # Categories, donnees de demo, URL du proxy
+    constants.js          # Categories, URL proxy, token API
     screens/
-      OnboardingScreen.js     # Ecran d'accueil au premier lancement
-      SplashScreen.js         # Animation de splash au demarrage
-      BriefingScreen.js       # Ecran principal avec liste des actualites
+      OnboardingScreen.js     # Onboarding anime avec rotation diamant
+      SplashScreen.js         # Splash screen avec logo diamant
+      BriefingScreen.js       # Liste des actualites avec skeleton loading
       SummaryScreen.js        # Resume/briefing avec synthese vocale
       ArticleDetailScreen.js  # Detail d'un article
       HistoryScreen.js        # Historique des briefings passes
-      SettingsScreen.js       # Reglages (theme, notifications, sources)
+      SettingsScreen.js       # Reglages (theme, notifications, voix, sources)
     components/
       NewsCard.js         # Carte d'actualite avec numero, categorie, favori
+      SkeletonCard.js     # Skeleton loading anime
       FilterBar.js        # Barre de filtrage par categorie
       SearchBar.js        # Barre de recherche d'articles
-      OfflineBanner.js    # Banniere mode hors-ligne / synchronisation
-      CacheInfoBar.js     # Indicateur de stockage cache (taille, nb articles)
-      ChromeCorners.js    # Effets visuels chrome sur les cartes
+      OfflineBanner.js    # Banniere mode hors-ligne
+      CacheInfoBar.js     # Indicateur de stockage cache
+      ChromeCorners.js    # Effets visuels chrome
     utils/
-      theme.js            # Systeme de themes (sombre/clair) avec contexte React
-      i18n.js             # Traductions (francais)
-      cache.js            # Gestion du cache (sauvegarde, chargement, stats)
-      network.js          # Detection du statut reseau (online/offline)
-      notifications.js    # Notifications push quotidiennes (web + mobile)
-      favorites.js        # Gestion des articles favoris
-      sources.js          # Selection des sources d'actualites (14 sources FR)
-      date.js             # Formatage des dates et temps relatif
-      haptics.js          # Retour haptique (vibrations)
-      tts.js              # Synthese vocale via ElevenLabs (choix de voix)
-      summary.js          # Generation du resume des articles
+      theme.js            # Themes sombre/clair
+      i18n.js             # Traductions (francais/anglais)
+      cache.js            # Gestion du cache
+      network.js          # Detection reseau
+      notifications.js    # Notifications push (web + mobile)
+      favorites.js        # Articles favoris
+      sources.js          # Sources d'actualites (14 sources FR)
+      date.js             # Formatage des dates
+      haptics.js          # Retour haptique
+      tts.js              # Synthese vocale via expo-speech
+      summary.js          # Generation du resume
 ```
 
-## APIs utilisees
+## API utilisee
 
 ### NewsData.io (actualites)
 - [newsdata.io](https://newsdata.io) - Plan gratuit : 200 requetes/jour
 - Endpoint : `GET /api/1/latest?country=fr&language=fr`
-- Filtrage natif par langue francaise
-- Articles en temps reel (pas de delai)
-
-### ElevenLabs (synthese vocale)
-- [elevenlabs.io](https://elevenlabs.io) - Plan gratuit : 10 000 caracteres/mois
-- Voix disponibles : Roger, George, Sarah, Alice
-- Modele : `eleven_multilingual_v2` (support natif du francais)
-- Voix naturelles et expressives, selectionnables dans les Reglages
+- Articles en temps reel
